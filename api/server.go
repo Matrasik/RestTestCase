@@ -4,6 +4,7 @@ import (
 	"Test_REST/handlers"
 	"github.com/gorilla/mux"
 	"gorm.io/gorm"
+	"log"
 	"net/http"
 	"time"
 )
@@ -24,7 +25,7 @@ func StartServer(db *gorm.DB) {
 
 	err := http.ListenAndServe(server.Addr, server.Handler)
 	if err != nil {
-		// TODO: log error
+		log.Fatal("Error starting server")
 		return
 	}
 }

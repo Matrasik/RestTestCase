@@ -4,6 +4,7 @@ import (
 	"Test_REST/models"
 	"encoding/json"
 	"fmt"
+	"github.com/google/uuid"
 	"github.com/gorilla/mux"
 	"gorm.io/gorm"
 	"io"
@@ -124,7 +125,23 @@ func (db *DBWrapper) GetBalance(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
 	//Получение баланса
 	vars := mux.Vars(r)
-	fmt.Fprint(w, vars["WALLET_UUID"])
+	walletUUID := vars["WALLET_UUID"]
+	var wallet models.Wallet
+	err := db.DB.First(&wallet, "wallet_id = ?", walletUUID).Error
+	if err != nil {
+		if err == gorm.ErrRecordNotFound {
+			http.Error(w, "Wallet not found", http.StatusNotFound)
+		} else {
+			http.Error(w, "Internal server error", http.StatusInternalServerError)
+		}
+	}
+	err = json.NewEncoder(w).Encode(struct {
+		WalletID uuid.UUID `json:"valletId"`
+		Balance  int       `json:"balance"`
+	}{wallet.WalletId, wallet.Balance})
+	if err != nil {
+		log.Println("error encode json")
+		return
+	}
 
-	//TODO: обращение к бд и получение баланса по юид
 }
