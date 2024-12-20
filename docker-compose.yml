@@ -1,0 +1,14 @@
+version: "3.9"
+
+services:
+  database:
+    container_name: database
+    image: postgres:latest
+    restart: always
+    env_file:
+      - config.env
+    ports:
+      - "54320:5432"
+    volumes:
+      - ./db_data:/var/lib/postgresql/
+
